@@ -1,0 +1,80 @@
+# config_4090.yaml - RTX 4090优化配置
+
+project_name: "AD-Diagnosis-TriLevel-Prior"
+exp_name: "TPFN_RTX4090_v1"
+seed: 42
+save_dir: "./checkpoints/TPFN_RTX4090_v1"
+use_wandb: true
+
+# 数据设置
+data:
+  adni_train_manifest: "C:/T1+MIND_V2/data/ADNI/manifest_train.csv"
+  adni_val_manifest: "C:/T1+MIND_V2/data/ADNI/manifest_val.csv"
+  push_test_manifest: "C:/T1+MIND_V2/data/PUSH/manifest_test.csv"
+  smhc_test_manifest: "C:/T1+MIND_V2/data/SMHC/manifest_test.csv"
+  group_prior_path: "./group_priors/combined_prior.npy"
+# 模型设置
+model:
+  backbone: "resnet18"  # resnet18更快，resnet50更准确
+  num_slices: 64
+  num_selected: 16
+  dim_slice: 256
+  clip_model: "openai/clip-vit-base-patch32"
+  use_local_clip: true  # 使用本地CLIP模型
+  local_clip_path: "./pretrained_models/clip-vit-base-patch32"
+  dim_demo: 13  # 修改为13维
+  focal_gamma: 2.0
+
+# ==================== 训练设置 ====================
+training:
+  # 基础参数
+  num_epochs: 50
+  batch_size: 8
+  num_workers: 6
+  
+  # 优化器
+  optimizer: "adamw"  # adamw, adam, sgd
+  lr: 0.0001  # 注意：不要加引号！
+  weight_decay: 0.0001
+  
+  # 学习率调度
+  scheduler: "cosine"  # cosine, step, plateau
+  lr_step: 30  # for step scheduler
+  lr_gamma: 0.1  # for step scheduler
+  
+  # 损失权重
+  focal_gamma: 2.0
+  
+  # 梯度裁剪
+  grad_clip: 1.0
+  
+  # 早停
+  early_stopping:
+    enabled: true
+    patience: 20
+    min_delta: 0.001
+
+# ==================== 验证和测试 ====================
+validation:
+  val_interval: 1  # 每几个epoch验证一次
+  save_best_only: true
+  metric: "acc_3way"  # acc_3way, auc, f1
+
+testing:
+  test_interval: 5  # 每几个epoch测试一次
+  save_predictions: true
+
+# ==================== 日志和检查点 ====================
+logging:
+  use_wandb: false
+  wandb_project: "AD_Diagnosis"
+  wandb_entity: null
+  
+  log_interval: 10  # 每几个batch打印一次
+  save_interval: 5  # 每几个epoch保存一次
+
+# ==================== 其他 ====================
+misc:
+  deterministic: true
+  benchmark: false
+  mixed_precision: false  # 使用混合精度训练

@@ -1,0 +1,54 @@
+data:
+  adni_train_manifest: C:/T1+MIND_V2/data/ADNI/manifest_train.csv
+  adni_val_manifest: C:/T1+MIND_V2/data/ADNI/manifest_val.csv
+  group_prior_path: ./group_priors/combined_prior.npy
+  push_test_manifest: C:/T1+MIND_V2/data/PUSH/manifest_test.csv
+  smhc_test_manifest: C:/T1+MIND_V2/data/SMHC/manifest_test.csv
+exp_name: TPFN_RTX4090_v1
+logging:
+  log_interval: 10
+  save_interval: 5
+  use_wandb: false
+  wandb_entity: null
+  wandb_project: AD_Diagnosis
+misc:
+  benchmark: false
+  deterministic: true
+  mixed_precision: false
+model:
+  backbone: resnet18
+  clip_model: openai/clip-vit-base-patch32
+  dim_demo: 13
+  dim_slice: 256
+  focal_gamma: 2.0
+  local_clip_path: ./pretrained_models/clip-vit-base-patch32
+  num_selected: 16
+  num_slices: 64
+  use_local_clip: true
+project_name: AD-Diagnosis-TriLevel-Prior
+save_dir: ./checkpoints/TPFN_RTX4090_v1
+seed: 42
+testing:
+  save_predictions: true
+  test_interval: 5
+training:
+  batch_size: 8
+  early_stopping:
+    enabled: true
+    min_delta: 0.001
+    patience: 20
+  focal_gamma: 2.0
+  grad_clip: 1.0
+  lr: 0.0001
+  lr_gamma: 0.1
+  lr_step: 30
+  num_epochs: 50
+  num_workers: 6
+  optimizer: adamw
+  scheduler: cosine
+  weight_decay: 0.0001
+use_wandb: true
+validation:
+  metric: acc_3way
+  save_best_only: true
+  val_interval: 1
